@@ -1,0 +1,55 @@
+class Solution {
+
+    // Function to find the number of ways to assign '+' or '-' signs to elements in the array
+    // such that the sum of the array equals the target
+    public int findTargetSumWays(int[] nums, int target) {
+        int n = nums.length;  // Length of the input array
+        int totalSum = 0;  // To store the total sum of the array elements
+        
+        // Calculate the total sum of the array elements
+        for(int i = 0; i < n; i++) {
+            totalSum += nums[i];
+        }
+        
+        // Edge case: If the absolute value of the target is greater than totalSum,
+        // or if (totalSum + target) is odd, no valid partition is possible
+        if (Math.abs(target) > totalSum || (totalSum + target) % 2 != 0) {
+            return 0;  // Return 0 as no valid partition exists
+        }
+        
+        // The problem reduces to finding subsets with the required sum
+        // derived from the equation (totalSum + target) / 2
+        int requiredSum = Math.abs(totalSum + target) / 2;
+        
+        // Count the number of subsets that sum up to requiredSum
+        return countSubsetSum(n, requiredSum, nums);
+    }
+
+    // Helper function to count the number of subsets that sum up to a given value
+    static int countSubsetSum(int n, int sum, int[] arr) {
+        // DP table to store the number of subsets for each sum value
+        int[][] dp = new int[n + 1][sum + 1];
+        
+        // Initialize base case: There's always one way to get sum 0 (by taking no elements)
+        for (int i = 0; i < n + 1; i++) {
+            dp[i][0] = 1;
+        }
+        
+        // Fill the DP table to compute the number of subsets for each sum value
+        for (int i = 1; i < n + 1; i++) {
+            for (int j = 0; j < sum + 1; j++) {
+                // If the current element is less than or equal to the current sum
+                if (arr[i - 1] <= j) {
+                    // We can either include the current element or exclude it
+                    dp[i][j] = dp[i - 1][j - arr[i - 1]] + dp[i - 1][j];
+                } else {
+                    // Otherwise, we exclude the current element
+                    dp[i][j] = dp[i - 1][j];
+                }
+            }
+        }
+        
+        // The result is the number of subsets that sum up to 'sum'
+        return dp[n][sum];
+    }
+}
